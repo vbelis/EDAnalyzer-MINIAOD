@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 #quick config
 IsData=False
 Run="A"
-output="output_KstarMuMu.root"
+output="output_test.root"
 RecoBtoKLepLep=False
 RecoBtoKstarLepLep=True
 SkipEventWithNoRecoB=False

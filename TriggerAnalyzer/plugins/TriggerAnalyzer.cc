@@ -167,6 +167,8 @@ private:
   virtual void beginJob() override;
   virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
   virtual void endJob() override;
+  virtual void  genJetMuAnalyze(const edm::Event& , const edm::EventSetup& );
+ 
   std::pair<std::vector<float>,std::vector<std::vector<float>>> L1Analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup);
   std::vector<std::pair<string,int>> L1SeedAnalyze(const edm::Event& iEvent,TString * algoBitToName, std::vector<string> Seed);
   std::pair<std::vector<float>,std::vector<std::vector<std::vector<float>>>> HLTAnalyze(const edm::Event& iEvent, const edm::EventSetup& iSetup,std::vector<string> HLTPath);
@@ -373,6 +375,17 @@ TriggerAnalyzer<T1>::~TriggerAnalyzer()
 //
 
 // ------------ method called for each event  ------------
+
+    template<typename T1>
+    void TriggerAnalyzer<T1>::genJetMuAnalyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+
+         using namespace std;
+         using namespace edm;
+         using namespace reco;
+         using namespace trigger;
+                                                                                                      }
+
+
 template<typename T1>
 std::pair<std::vector<float>,std::vector<std::vector<float>>>  TriggerAnalyzer<T1>::L1Analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
   using namespace std;
@@ -596,6 +609,8 @@ TriggerAnalyzer<T1>::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   using namespace reco;
   using namespace trigger;
 
+//(07.05.19): Template for my bPurity in inclusive muon data analysis
+  if(!data) genJetMuAnalyze(iEvent,iSetup);
 
   //Get a few collections to apply basic electron ID
 
@@ -634,7 +649,7 @@ TriggerAnalyzer<T1>::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   iEvent.getByToken( elIdMapValueToken_ ,ele_mva_id_value);
   edm::ESHandle<MagneticField> bFieldHandle;
   iSetup.get<IdealMagneticFieldRecord>().get(bFieldHandle);
-// GeneratorBTree gen(prunedGenToken_,packedGenToken_,iEvent);
+  // GeneratorBTree gen(prunedGenToken_,packedGenToken_,iEvent);
 edm::Handle<GlobalAlgBlkBxCollection> l1result;
   iEvent.getByToken(l1resultToken_,l1result);
 if (count==0){
@@ -771,7 +786,7 @@ NRb_ex_ey_ez.clear(); NRb_ept_eeta_ephi.clear(); NRb_mudecay.clear();
    //K0 fit kalman
    KalmanVertexFitter theKalmanFitter(false);
    TransientVertex K0vertex;
-
+/*(07.05.19): No need to use George's GeneratorBTree class for my gen Analysis
 if(!data){
      GeneratorBTree gen(prunedGenToken_,packedGenToken_,iEvent);
      ngenB=gen.BMother_Pt().size();
@@ -790,7 +805,7 @@ if(!data){
      genLep_eta=gen.genLep_Eta(); genLep_pdgId=gen.genLep_pdgId(); 
      genLep_mom=gen.genLep_Mother();
  }
-
+*/
  
  //std::vector<std::vector<float>> muskatatest;
  ///////////////////
@@ -1295,10 +1310,11 @@ const pat::MET &theMet = met->front();
   for (const pat::Jet &jet : *jets){
     if(jet.pt()<10.) continue;
     if (fabs(jet.eta())>2.5) continue;
-    cout<<"jet.pat::Jet::hadronFlavour()= "<<jet.pat::Jet::hadronFlavour()<<endl;
-    cout<<"jet.pat::Jet::partonFlavour()= "<<jet.pat::Jet::partonFlavour()<<endl;
-    cout<<"jet.pat::Jet::jetFlavourInfo()->getHadronFlavour()= "<< jet.pat::Jet::jetFlavourInfo().getHadronFlavour()<<endl;
-    cout<<"jet.pat::Jet::jetFlavourInfo()->getPartonFlavour()= "<< jet.pat::Jet::jetFlavourInfo().getPartonFlavour()<<endl;
+
+//    cout<<"jet.pat::Jet::hadronFlavour()= "<<jet.pat::Jet::hadronFlavour()<<endl;
+//    cout<<"jet.pat::Jet::partonFlavour()= "<<jet.pat::Jet::partonFlavour()<<endl;
+//    cout<<"jet.pat::Jet::jetFlavourInfo()->getHadronFlavour()= "<< jet.pat::Jet::jetFlavourInfo().getHadronFlavour()<<endl;
+//    cout<<"jet.pat::Jet::jetFlavourInfo()->getPartonFlavour()= "<< jet.pat::Jet::jetFlavourInfo().getPartonFlavour()<<endl;
 
     jet_pt.push_back(jet.pt()); jet_eta.push_back(jet.eta());
     jet_phi.push_back(jet.phi());
@@ -1349,7 +1365,6 @@ const pat::MET &theMet = met->front();
     totb1+=trigger2; totb2+=trigger3; totb3+=trigger5;
     //cout<<"B trg1 "<<trigger1<<" trg2 "<<trigger2<<" trg3 "<<trigger3<<endl;
   t1->Fill();
-
 
 }
 
