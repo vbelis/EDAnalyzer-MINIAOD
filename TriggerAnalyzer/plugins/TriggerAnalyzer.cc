@@ -383,6 +383,234 @@ TriggerAnalyzer<T1>::~TriggerAnalyzer()
          using namespace edm;
          using namespace reco;
          using namespace trigger;
+	 
+	  //  edm::EDGetToken GenToken_;
+  // GenToken_=consumes<edm::View<reco::GenParticle>>(iConfig.getParameter<edm::InputTag>("gen"));  
+  edm::Handle<edm::View<reco::GenParticle>> genPart;
+  iEvent.getByToken(GenToken_,genPart);
+
+//VB:-------------------------------------------------GEN JET ANALYSIS-------------------------------------------------
+
+  genJet_mass.clear();//test if there is a difference in where the vectors used are cleared(the others are in analyze methodi). It seems that it does not matter...
+  bgenJet_genQuark_pt_ratio.clear();cgenJet_genQuark_pt_ratio.clear();lightgenJet_genQuark_pt_ratio.clear();
+  edm::Handle<edm::View<reco::GenJet>> genJet;
+  iEvent.getByToken(GenJet_token_,genJet);
+ 
+   vector<reco::GenJet> genJet_collection;//collecting all potential genJet's with critirial: CUTS & existance of muons. Saved GenJet will ultimately have 
+                                          // a muon whose mother quark is the same quark as the one to which the Jet is associated.
+
+
+   map<unsigned int, const reco::GenParticle*> genJet_genMu_map;//27/1/19:Some GenJets will be skipped due to kinematic cuts and/or muon existance requirement. Thus this map should be accesed exclusively by iterators because exact key values(i.e. index of GenJet in the event) is not known/saved. It could be done, but now only iterators..
+
+  cout<<"==================START OF EVENT ("<<event<<") GENJET/GENMU COLLECTION ================"<<endl;
+   for(typename edm::View<reco::GenJet>::const_iterator genjet=genJet->begin(); genjet !=genJet->end();++genjet){
+//TRYING NEW IDEA FOR MU_JET_QUARK 100% MATCH 15.1.2019.
+//genMu's are defined only as mu's in Jet cones.
+unsigned int nmuons=0;
+vector<const reco::GenParticle *> genMu_in_Jet;
+    if(fabs(genjet->eta())>2.1 || genjet->pt()<10.) continue;
+          
+         for(unsigned int icon=0; icon<genjet->getGenConstituents().size() ;++icon){
+           if(fabs(genjet->getGenConstituent(icon)->pdgId())!=13 || genjet->getGenConstituent(icon)->isLastCopy()==false || genjet->getGenConstituent(icon)->pt()<6. || fabs(genjet->getGenConstituent(icon)->eta())>2.1) continue;
+            ++nmuons;//the size of genMu_in_Jet could be used as well..though it would be less verbose.
+
+            genMu_in_Jet.push_back(&*genjet->getGenConstituent(icon));
+/*
+            const reco::Candidate *mo=&*genjet->getGenConstituent(icon)->mother(), *mo2=mo->mother(),*mo3=mo2->mother();//parenthood of potential GenMu's.
+            printf("---GenMu ('%u') in GenJet (it.index before collection '%li') in event ('%i')",nmuons,genjet-genJet->begin(),event);
+            cout<<": status/pt/DR(mu-jet)= "<<genjet->getGenConstituent(icon)->status()<<"/"<<genjet->getGenConstituent(icon)->pt()<<"/"<<deltaR(genjet->getGenConstituent(icon)->eta(),genjet->getGenConstituent(icon)->phi(),genjet->eta(),genjet->phi())<<"\n";
+            cout<<"---^mother-> "<<mo->pdgId()<<"/"<<mo->status()<<"/"<<deltaR(mo->eta(),mo->phi(),genjet->eta(),genjet->phi())<<"\n";
+            cout<<"---^gmother-> "<<mo2->pdgId()<<"/"<<mo2->status()<<"/"<<deltaR(mo2->eta(),mo2->phi(),genjet->eta(),genjet->phi())<<"\n";
+            cout<<"---^ggmother-> "<<mo3->pdgId()<<"/"<<mo3->status()<<"/"<<deltaR(mo3->eta(),mo3->phi(),genjet->eta(),genjet->phi())<<endl;
+*/
+              if(nmuons==1){
+                         genJet_collection.push_back(*genjet);
+                         genJet_genMu_map[genJet_collection.size()-1] = &*genjet->getGenConstituent(icon);//changing the Key values to genJet_collection (collected index)
+//                         genJet_genMu_map[genjet-genJet->begin()] = &*genjet->getGenConstituent(icon);
+                                                               }
+
+              else{// cout<<"! ! ! More than 1 GenMu found in GenJet-cone. Mapping to GenJet only the muon with the max pT"<<endl;
+                    unsigned int max_index=0;
+                    float max_value=genMu_in_Jet.at(0)->pt();//initialization for finding the muon with the maximum pt in the Jet.
+                      for(unsigned  int w=0;w<genMu_in_Jet.size();++w){
+                              if(genMu_in_Jet.at(w)->pt()<=max_value) continue;
+                                 max_value=genMu_in_Jet.at(w)->pt();
+                                 max_index=w;                          }
+
+                                   genJet_genMu_map.at(genJet_collection.size()-1) = &*genMu_in_Jet.at(max_index);                  
+                                  // genJet_genMu_map.at(genjet-genJet->begin()) = &*genMu_in_Jet.at(max_index);                  
+                   }
+                                          } 
+              
+                     }
+     
+  cout<<"=================END OF EVENT ("<<event<<") GENJET/GENMU COLLECTION ==============="<<endl;
+
+//Checking on how to access mu's which are paired with collected GenJets...
+
+if(genJet_genMu_map.size()!=0){
+ for(std::map<unsigned int,const reco::GenParticle*>::const_iterator it=genJet_genMu_map.begin(); it!=genJet_genMu_map.end();++it){
+            const reco::Candidate *mo=&*it->second->mother(),*mo2=mo->mother(),*mo3=mo2->mother();
+            float genjet_eta=genJet_collection.at(it->first).eta(),genjet_phi=genJet_collection.at(it->first).phi();
+            printf("---CHECK: GenMu->GenJet( collection index '%u'): /status/pt/DR(mu-jet)= /%i/%f/%f \n",it->first,it->second->status(),it->second->pt(),deltaR(it->second->eta(),it->second->phi(),genjet_eta,genjet_phi));
+            cout<<"---^mother-> "<<mo->pdgId()<<"/"<<mo->status()<<"/"<<mo->pt()<<"/"<<deltaR(mo->eta(),mo->phi(),genjet_eta,genjet_phi)<<"\n";
+            cout<<"---^gmother-> "<<mo2->pdgId()<<"/"<<mo2->status()<<"/"<<mo2->pt()<<"/"<<deltaR(mo2->eta(),mo2->phi(),genjet_eta,genjet_phi)<<"\n";
+            cout<<"---^ggmother-> "<<mo3->pdgId()<<"/"<<mo3->status()<<"/"<<mo3->pt()<<"/"<<deltaR(mo3->eta(),mo3->phi(),genjet_eta,genjet_phi)<<endl;
+/*
+            for(unsigned int idau=0;idau<mo->numberOfDaughters();++idau){
+                      cout<<"====mother's  daughter (check ofc except muon)-> "<<mo->daughter(idau)->pdgId()<<"/"<<mo->daughter(idau)->status();
+                      cout<<"/"<<mo->daughter(idau)->pt()<<"/"<<deltaR(mo->daughter(idau)->eta(),mo->daughter(idau)->phi(),genjet_eta,genjet_phi)<<endl;
+                                                                    }
+            for(unsigned int imo=0;imo<mo2->numberOfMothers();++imo){
+                      cout<<"====gmother(wanting a meson) mother-> "<<mo2->mother(imo)->pdgId()<<"/"<<mo2->mother(imo)->status();
+                      cout<<"/"<<mo2->mother(imo)->pt()<<"/"<<deltaR(mo2->mother(imo)->eta(),mo2->mother(imo)->phi(),genjet_eta,genjet_phi)<<endl;
+                                                                    }
+            for(unsigned int idau=0;idau<mo3->numberOfDaughters();++idau){
+                      cout<<"====ggmother daghter (wanting fragmentation daugthers)-> "<<mo3->daughter(idau)->pdgId()<<"/"<<mo3->daughter(idau)->status();
+                      cout<<"/"<<mo3->daughter(idau)->pt()<<"/"<<deltaR(mo3->daughter(idau)->eta(),mo3->daughter(idau)->phi(),genjet_eta,genjet_phi)<<endl;
+                                                                            }
+*/                                                                     
+
+
+                                                                                                                                   }
+                                       }
+
+
+   //Jet-matching
+  cout<<"=================START OF EVENT ("<<event<<") GENJET ANALYSIS ==============="<<endl;
+
+   for(unsigned int q=0;q<genJet_collection.size();++q){
+    vector<const reco::GenParticle *> genQuark_collection;
+    vector<unsigned int> genQuark_collection_pdgId;
+    bool btag=false,ctag=false,udstag=false;
+
+
+     for(typename edm::View<reco::GenParticle>::const_iterator genq=genPart->begin(); genq != genPart->end() ; ++genq){
+
+              if(fabs(genq->pdgId())>5 || genq->status()!=71 || genq->isLastCopy()==false || deltaR(genq->eta(),genq->phi(),genJet_collection.at(q).eta(),genJet_collection.at(q).phi())>0.4) continue;
+               genQuark_collection.push_back(&*genq);
+               genQuark_collection_pdgId.push_back(fabs(genq->pdgId()));
+  //             cout<<"GenQuark ('"<<genQuark_collection.size()<<"') merged into GenJet (collected index'"<<q<<"')-cone:|pdgId|/pT/[pT(Quark)/pT(Jet)]/= "<<fabs(genq->pdgId())<<"/"<<genq->pt()<<"/["<<genq->pt()/genJet_collection.at(q).pt()<<"]/" << endl;
+                                                                                                                      }
+
+             if(genQuark_collection.empty()){ printf("GenJet (collection index: '%u') in event ('%i') did not have a genQuark in cone\n",q,event);  continue;}
+             unsigned int max_pdgId = *std::max_element(genQuark_collection_pdgId.begin(),genQuark_collection_pdgId.end());
+             unsigned int max_index = std::distance(genQuark_collection_pdgId.begin(),std::max_element(genQuark_collection_pdgId.begin(),genQuark_collection_pdgId.end()));     
+             //27/1/19: iterate on genQuark_collection, and compare the pdgId's of quarks not placed on max_index position, then take the one with the minimum 1-pT(quark)/pT(jet)
+             //ASK SPHICAS ABOUT THAT!!!!!!!!!!
+             for(unsigned int i_quark=0;i_quark<genQuark_collection.size();++i_quark){
+               if(i_quark==max_index) continue;
+               if(genQuark_collection_pdgId.at(i_quark)== max_pdgId){
+  //               cout<<"!-!-! Found two GenQuark (c.i.:('"<<max_index<<"' & '"<<i_quark<<"')"<<" in GenJet (c.i.:'"<<q<<"') with the max_pdgId. Comparing their DR & 1-pT(quark)/pT(jet)."<<endl;
+                 float pt_ratio_max_index= 1.-genQuark_collection.at(max_index)->pt()/genJet_collection.at(q).pt(),pt_ratio_i_quark= 1.-genQuark_collection.at(i_quark)->pt()/genJet_collection.at(q).pt();
+/*
+                 float DR_jet_quark_max_index = deltaR(genQuark_collection.at(max_index)->eta(),genQuark_collection.at(max_index)->phi(),genJet_collection.at(q).eta(),genJet_collection.at(q).phi());
+                 float DR_jet_quark_i_quark= deltaR(genQuark_collection.at(i_quark)->eta(),genQuark_collection.at(i_quark)->phi(),genJet_collection.at(q).eta(),genJet_collection.at(q).phi());
+*/
+    //             printf("1-pT(quark'%u')/pT(jet)= %f, 1-pT(quark '%u')/pT(jet)= %f, DR(quark'%u'-jet)= %f, DR(quark'%u'-jet)= %f \n",max_index,pt_ratio_max_index,i_quark,pt_ratio_i_quark,max_index,DR_jet_quark_max_index,i_quark,DR_jet_quark_i_quark);
+                 if(pt_ratio_max_index<pt_ratio_i_quark) continue;
+                  max_index=i_quark;
+                                                                     }
+
+                                                                                     }
+
+             if(max_pdgId==5){ cout<<"b-tag: pT(Quark)/pT(Jet) = "<<genQuark_collection.at(max_index)->pt()/genJet_collection.at(q).pt()<<endl;
+                               btag=true;
+/*             for(unsigned int idaughter=0;idaughter<genQuark_collection.at(max_index)->numberOfDaughters();++idaughter){
+                  cout<<"===Daughter of above quark: pdgId/status/DR(daughter-jet)/"=;
+                                                                                                                      }*/
+                             }
+             else if(max_pdgId==4){ cout<<"c-tag: pT(Quark)/pT(Jet)= "<<genQuark_collection.at(max_index)->pt()/genJet_collection.at(q).pt()<<endl; ctag=true;}
+             else{ cout<<"uds-tag: pT(Quark)/pT(Quark)/pT(Jet)= "<<genQuark_collection.at(max_index)->pt()<<"/"<<genQuark_collection.at(max_index)->pt()/genJet_collection.at(q).pt()<<endl; udstag=true;}
+
+              
+         //The following is why genJet_genMu_map changed key indeces to genJet collected i.e. genJet_collection:
+            bool full_match=false;
+             const reco::Candidate * recursive_mo= genJet_genMu_map.at(q)->mother(); 
+                 //30/1/19: Check if GenQuark of GenJet excists in GenMu's DIRECT parenthood list.
+                  while(recursive_mo->pdgId() != 2212 && recursive_mo->pdgId() != 21){ //first proton                                
+    //                   cout<<"recursive mother of collected GenMu pdgId/status/pT= "<<recursive_mo->pdgId()<<"/"<<recursive_mo->status()<<"/"<<recursive_mo->pt()<<endl; 
+                   if(deltaR(recursive_mo->eta(),recursive_mo->phi(),genJet_collection.at(q).eta(),genJet_collection.at(q).phi())>0.4){
+                    //    cout<<"recursive_mo not in GenJet"<<endl; 
+                                   recursive_mo = recursive_mo->mother();
+
+                        	continue;
+                                                                                                                                      }
+                        
+
+                        //cout<<"recursive mother of collected GenMu pdgId/status/pT= "<<recursive_mo->pdgId()<<"/"<<recursive_mo->status()<<"/"<<recursive_mo->pt()<<endl; 
+                            
+                            if(recursive_mo->pdgId()==genQuark_collection.at(max_index)->pdgId() && recursive_mo->pt() == genQuark_collection.at(max_index)->pt()){
+                               full_match=true;
+                                 printf(">>>>>>>GenQuark of '%u' GenJet matched mother of GenMu \n",q);
+                                 break;
+                                                                                                                                                                     } 
+                                   recursive_mo = recursive_mo->mother();
+                                                       }
+                
+                   //re-initialize 
+            if(full_match==false){         
+                   recursive_mo = genJet_genMu_map.at(q)->mother();
+                   const reco::Candidate * first_fragmentation_meson = genJet_genMu_map.at(q);//using this to save the meson
+                    while(fabs(recursive_mo->pdgId())>5 && recursive_mo->pdgId()!=21){
+                       recursive_mo = recursive_mo->mother();
+                       first_fragmentation_meson = first_fragmentation_meson->mother();
+                                                        }
+                                 
+      //               cout<<"@@@@First meson found: pdgId/status/pT/DR(meson-jet)= "<<first_fragmentation_meson->pdgId()<<"/"<<first_fragmentation_meson->status()<<"/"<<first_fragmentation_meson->pt()<<"/";
+                     cout<<deltaR(first_fragmentation_meson->eta(),first_fragmentation_meson->phi(),genJet_collection.at(q).eta(),genJet_collection.at(q).phi())<<endl;
+
+                     //Now lets go and find the quark which both "created" the Jet and is mother of the meson that decayed to the mu!
+                     for(unsigned int m=0;m<first_fragmentation_meson->numberOfMothers();m++){
+                     //   printf("1st frag. meson mothers: pdgId/pT= %i/%f\n", first_fragmentation_meson->mother(m)->pdgId(),first_fragmentation_meson->mother(m)->pt());
+                        if(first_fragmentation_meson->mother(m)->pdgId()==genQuark_collection.at(max_index)->pdgId() && first_fragmentation_meson->mother(m)->pt()==genQuark_collection.at(max_index)->pt() && first_fragmentation_meson->mother(m)->eta()==genQuark_collection.at(max_index)->eta() && first_fragmentation_meson->mother(m)->phi()==genQuark_collection.at(max_index)->phi()){
+                           cout<<":-))))))))))) FULL MATCH ACHIEVED YAAAAASS"<<endl; 
+                           full_match=true;
+                           
+                           }
+                                                                                            }
+
+                                  }
+                                     
+               if(full_match==false) cout<<" NOT FULL MATCH IN THIS JET :-((((((((((("<<endl;
+               else{
+                        genJet_pt.push_back(genJet_collection.at(q).pt());
+                        genJet_eta.push_back(genJet_collection.at(q).eta());
+                        genJet_y.push_back(genJet_collection.at(q).y());
+                        genJet_phi.push_back(genJet_collection.at(q).phi());
+                        genJet_mass.push_back(genJet_collection.at(q).mass());
+                        genJet_flavour.push_back(genQuark_collection.at(max_index)->pdgId());
+                      
+                      float dR = deltaR(genJet_genMu_map.at(q)->eta(),genJet_genMu_map.at(q)->phi(),genJet_collection.at(q).eta(),genJet_collection.at(q).phi()); 
+                      if(btag==true){          
+                      dR_bJet_matching.push_back(dR);    
+                      bgenJet_genQuark_pt_ratio.push_back(genQuark_collection.at(max_index)->pt()/genJet_collection.at(q).pt());
+                      genMuB_pt.push_back(genJet_genMu_map.at(q)->pt());   
+                      genMuB_eta.push_back(genJet_genMu_map.at(q)->eta());   
+                      genMuB_phi.push_back(genJet_genMu_map.at(q)->phi());   
+                                   }
+                      else if(ctag==true){          
+                      dR_cJet_matching.push_back(dR);    
+                      cgenJet_genQuark_pt_ratio.push_back(genQuark_collection.at(max_index)->pt()/genJet_collection.at(q).pt());
+                      genMuC_pt.push_back(genJet_genMu_map.at(q)->pt());   
+                      genMuC_eta.push_back(genJet_genMu_map.at(q)->eta());   
+                      genMuC_phi.push_back(genJet_genMu_map.at(q)->phi());   
+                                   }
+                      else if(udstag==true){          
+                      dR_lightJet_matching.push_back(dR);    
+                      lightgenJet_genQuark_pt_ratio.push_back(genQuark_collection.at(max_index)->pt()/genJet_collection.at(q).pt());
+                      genMuUDS_pt.push_back(genJet_genMu_map.at(q)->pt());   
+                      genMuUDS_eta.push_back(genJet_genMu_map.at(q)->eta());   
+                      genMuUDS_phi.push_back(genJet_genMu_map.at(q)->phi());   
+                                   }
+
+                   }
+                                           }//genJet_collection loop
+
+//--------------------------------DELETED !!!OLD JET TAGGING CODE. FLAW: CAN MATCH MORE THAN 1 QUARK TO JET AND CHANGE ITS FLAVOUR ID!------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------                                           
+
+  cout<<"=================END OF EVENT("<<event<<") GENJET ANALYSIS ==============="<<endl;
                                                                                                       }
 
 
