@@ -1,9 +1,9 @@
 #!bin/bash
-   echo -n "Want default time validity of the proxy (12h)? (y/n) "
+   echo -n "Do you need more that 1h of time validty for the proxy? (y/n) "
    read   answer
-   if [ $answer = "y"  ] 
+   if [ $answer = "n"  ] 
       then
-         voms-proxy-init --rfc --voms cms
+         voms-proxy-init --rfc --valid 01:00 --voms cms
    else 
        echo -n "How much validity time do you want in XY:ZK (h:m)?"
        read validity_time

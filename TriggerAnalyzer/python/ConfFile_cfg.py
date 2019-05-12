@@ -1,3 +1,4 @@
+
 import FWCore.ParameterSet.Config as cms
 #quick config
 IsData=False
@@ -10,7 +11,7 @@ MuonsOnly=True
 ElectronsOnly=False
 addlostTrk=True
 saveTrk=False
-Nentries=100
+Nentries=1000
 File=['/store/data/Run2018B/ParkingBPH5/MINIAOD/PromptReco-v1/000/317/650/00000/321646CB-F76E-E811-91FF-FA163EE936A8.root']
 ############
 if RecoBtoKLepLep : 
@@ -135,7 +136,7 @@ process.demo = cms.EDAnalyzer('TriggerAnalyzerb',
                               eleIdMapVeto = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-veto"),
                               eleIdMapSoft = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wpLoose"),
                               eleIdMapMedium = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp90"),
-                             eleIdMapTight = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp80"),
+                              eleIdMapTight = cms.InputTag("egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp80"),
                               eleIdMapValue = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17NoIsoV1Categories"),
                               #If you want no L1_Seed, write "default" in the first element and the tree will write the value -100
                                Seed=cms.vstring("L1_SingleMu7er1p5","L1_SingleMu8er1p5","L1_SingleMu9er1p5","L1_SingleMu10er1p5","L1_SingleMu12er1p5","L1_SingleMu22"),
@@ -153,6 +154,8 @@ process.demo = cms.EDAnalyzer('TriggerAnalyzerb',
                               pruned = cms.InputTag("prunedGenParticles"),
                               PFCands=cms.InputTag("packedPFCandidates"),
                               losttracks=cms.InputTag("lostTracks"),
+                              genjets=cms.InputTag("slimmedGenJets"),
+
  #                              tracks=cms.InputTag("unpackedTracksAndVertices"),
 
                                RunParameters = cms.PSet(
