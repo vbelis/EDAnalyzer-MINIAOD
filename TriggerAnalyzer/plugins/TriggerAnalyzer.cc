@@ -455,10 +455,9 @@ bool TriggerAnalyzer<T1>::isAncestor(const reco::Candidate* ancestor, const reco
                                         }
                                                                                                      }
                                                                                                                                                      }
+      if(max_mu != nullptr){
          printf("muon pT_max= %f\n",max_mu->pt());
          for(typename edm::View<reco::GenJet>::const_iterator genjet=genJet->begin(); genjet !=genJet->end();++genjet){
-      //TRYING NEW IDEA FOR MU_JET_QUARK 100% MATCH 15.1.2019.
-      //genMu's are defined only as mu's in Jet cones.
       unsigned int nmuons=0;
       vector<const reco::Candidate*> genMu_in_Jet;
           if(fabs(genjet->eta())>2.1 || genjet->pt()<10.) continue;//first lets have no genJet cut. in MINI-AOD only pT>8 Jets are saved/merged.
@@ -716,8 +715,9 @@ bool TriggerAnalyzer<T1>::isAncestor(const reco::Candidate* ancestor, const reco
       
       //--------------------------------DELETED !!!OLD JET TAGGING CODE. FLAW: CAN MATCH MORE THAN 1 QUARK TO JET AND CHANGE ITS FLAVOUR ID!------------------------------------------
       //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------              
-                                                                                                      }
-
+                }//if_nullptr_mu's
+        else cout<<"No muons passed the cuts"<<endl;
+                                                                                                         }
 
 template<typename T1>
 std::pair<std::vector<float>,std::vector<std::vector<float>>>  TriggerAnalyzer<T1>::L1Analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
