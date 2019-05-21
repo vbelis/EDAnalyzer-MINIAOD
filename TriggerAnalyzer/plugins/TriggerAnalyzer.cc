@@ -436,18 +436,26 @@ bool TriggerAnalyzer<T1>::isAncestor(const reco::Candidate* ancestor, const reco
                                                                           }
                                             }
                                                                                                                                                   }
-         cout<<"@@@@@PackedGenParticles Collection:\n"<<endl;
+************************************************************************/
+
+//         cout<<"@@@@@PackedGenParticles Collection:\n"<<endl;
+         float mu_pt=-1.;
+         const reco::Candidate *max_mu=nullptr;  
          for(typename edm::View<pat::PackedGenParticle>::const_iterator packedPart = genPacked->begin(); packedPart != genPacked->end();++packedPart){
             if(abs(packedPart->pdgId())==13 && packedPart->pt()>5. && abs(packedPart->eta())<2.1){
             const reco::Candidate* mo = packedPart->mother(0);
-            printf("packedPart: status/pdgId/pt/eta/MOpdgId= %i/%i/%f/%f/%i\n", packedPart->status(),packedPart->pdgId(),packedPart->pt(),packedPart->eta(),mo->pdgId());              
-                for(unsigned int imom=0;imom<mo->numberOfMothers();++imom){
-                 const reco::Candidate* recursive_mo = mo->mother(imom); 
-                 printf("recursive mother of Packed muon: pdgId/status/pt= %i/%i/%f\n",recursive_mo->pdgId(),recursive_mo->status(),recursive_mo->pt());
-                                                            }
-                                            }
+            printf("%li packedPart: status/pdgId/pt/eta/MOpdgId= %i/%i/%f/%f/%i\n", packedPart-genPacked->begin(),packedPart->status(),packedPart->pdgId(),packedPart->pt(),packedPart->eta(),mo->pdgId());              
+//                for(unsigned int imom=0;imom<mo->numberOfMothers();++imom){
+//                 const reco::Candidate* recursive_mo = mo->mother(imom); 
+//                 printf("recursive mother of Packed muon: pdgId/status/pt= %i/%i/%f\n",recursive_mo->pdgId(),recursive_mo->status(),recursive_mo->pt());
+//                                                            }
+              if(mu_pt<packedPart->pt()){
+                max_mu = &(*packedPart);
+                mu_pt=packedPart->pt();
+                                        }
+                                                                                                     }
                                                                                                                                                      }
-************************************************************************/
+         printf("muon pT_max= %f\n",max_mu->pt());
          for(typename edm::View<reco::GenJet>::const_iterator genjet=genJet->begin(); genjet !=genJet->end();++genjet){
       //TRYING NEW IDEA FOR MU_JET_QUARK 100% MATCH 15.1.2019.
       //genMu's are defined only as mu's in Jet cones.

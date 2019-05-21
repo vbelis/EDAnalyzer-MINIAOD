@@ -2,7 +2,7 @@
 import FWCore.ParameterSet.Config as cms
 IsData=False
 Run="A"
-output_path="/afs/cern.ch/work/v/vbelis/private/QCD_Pt170to300_MINIAOD_170519_fragmentation.root"
+output_path="/afs/cern.ch/work/v/vbelis/private/test_for_no04DR_210519.root"
 RecoBtoKLepLep=False
 RecoBtoKstarLepLep=True
 SkipEventWithNoRecoB=False
@@ -10,8 +10,8 @@ MuonsOnly=True
 ElectronsOnly=False
 addlostTrk=True
 saveTrk=False
-Nentries=629771
-#Nentries=10000
+#Nentries=629771
+Nentries=10
 File=['/store/data/Run2018B/ParkingBPH5/MINIAOD/PromptReco-v1/000/317/650/00000/321646CB-F76E-E811-91FF-FA163EE936A8.root']
 ############
 if RecoBtoKLepLep : 
