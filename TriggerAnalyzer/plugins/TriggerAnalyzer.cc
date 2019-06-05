@@ -1100,36 +1100,6 @@ if(!data){
  //  int snmu=0;
    //    OAEParametrizedMagneticField * paramField_ = new OAEParametrizedMagneticField("3_8T");
     std::vector<reco::TransientTrack> muttks,ettks,jpsimuttks,jpsiettks;
-     std::vector<int> muindex,elindex,mucharge,elcharge;
-  for (const pat::Muon &mu : *muons){    
-     for (unsigned int i=0, n=mu.numberOfSourceCandidatePtrs(); i<n; ++i){
-        footprint.push_back(mu.sourceCandidatePtr(i));
-    }
-    muon_pt.push_back(mu.pt());  muon_phi.push_back(mu.phi());
-    muon_eta.push_back(mu.eta()); muon_charge.push_back(mu.charge());
-    const Track * mutrack= mu.bestTrack();
-    muon_dz.push_back(mutrack->dz(vertex_point));
-    muon_dxy.push_back(mutrack->dxy(vertex_point));
-    muon_global_flag.push_back(mu.isGlobalMuon());
-    muon_standalone_flag.push_back(mu.isStandAloneMuon());
-    muon_tracker_flag.push_back(mu.isTrackerMuon());
-    muon_vx.push_back(mu.vx());  muon_vy.push_back(mu.vy());
-    muon_vz.push_back(mu.vz());  muon_edz.push_back(mu.dzError());
-    muon_edxy.push_back(mu.dxyError());  muon_d0.push_back(mutrack->d0());
-    muon_ed0.push_back(mutrack->d0Error());
-    muon_medium.push_back(mu.isMediumMuon());
-    muon_loose.push_back(mu.isLooseMuon());
-    muon_trkpt.push_back(mutrack->pt()); muon_trketa.push_back(mutrack->eta());
-    muon_trkphi.push_back(mutrack->phi());
-    muon_tight.push_back(mu.isTightMuon(firstGoodVertex));
-    muon_soft.push_back(mu.isSoftMuon(firstGoodVertex));
-   // if (mu.isSoftMuon(firstGoodVertex))snmu++;
-    const MuonPFIsolation&  isol=mu.pfIsolationR04();
-    double mu_iso=(isol.sumChargedHadronPt+max(0.,isol.sumNeutralHadronEt+isol.sumPhotonEt-0.5*isol.sumPUPt))/mu.pt();
-    muon_iso.push_back(mu_iso);
-    muttks.push_back(reco::TransientTrack(*mutrack,&(*bFieldHandle)));   
-    nmuons++;
-    }
     size_type eindex=-1;
     for(const pat::Electron &el : *electrons){
       eindex++;
@@ -1596,36 +1566,65 @@ const pat::MET &theMet = met->front();
     phimet=theMet.phi();
 
   cout<<  "======pat::Jet analysis:" <<endl;
-  if(!data){ 
+  if(!data){
     std::pair<const reco::GenJet*, const reco::Candidate *> genJet_genMu_pair = genJetMuAnalyze(iEvent,iSetup);
-      for (const pat::Jet &jet : *jets){ 
-        if(genJet_genMu_pair.first == nullptr && genJet_genMu_pair.second == nullptr){
-           cout<<"genJet-genMu pair not made"<<endl;
-           break;
-                                                                                     }
-        else{
+    if(genJet_genMu_pair.first != nullptr && genJet_genMu_pair.second != nullptr){
+      for (const pat::Jet &jet : *jets){
         if(jet.pt()<10. || abs(jet.eta())>2.1) continue;
         if(jet.neutralHadronEnergyFraction()>=0.90 || jet.neutralEmEnergyFraction()>=0.90 || (jet.neutralMultiplicity()+jet.chargedMultiplicity())<=1 || jet.chargedHadronMultiplicity()<=0 || jet.chargedMultiplicity()<=0) continue;
         const reco::GenJet* genJet_matched = jet.pat::Jet::genJet();
            if(genJet_matched != nullptr){
                  if(genJet_genMu_pair.first == genJet_matched){
-                    cout<<" YEAAAAH PAT::JET HAS CORRECTLY MATCHED TO RECO::GENJET "<<endl;
-                    printf("matched GenJet: pT/eta/phi= %f/%f/%f\n", genJet_matched->pt(),genJet_matched->eta(),genJet_matched->phi());                    
-                    printf("associated GenMu: pT/eta/phi= %f/%f/%f\n", genJet_genMu_pair.second->pt(),genJet_genMu_pair.second->eta(),genJet_genMu_pair.second->phi());
-                    //cout<<"jet.pat::Jet::hadronFlavour()= "<<jet.pat::Jet::hadronFlavour()<<endl;
-                    //cout<<"jet.pat::Jet::partonFlavour()= "<<jet.pat::Jet::partonFlavour()<<endl;
-                    //cout<<"jet.pat::Jet::jetFlavourInfo()->getHadronFlavour()= "<< jet.pat::Jet::jetFlavourInfo().getHadronFlavour()<<endl;
+                 bool found_muon = false;
+//                    cout<<"YEAAAAH PAT::JET HAS CORRECTLY MATCHED TO RECO::GENJET "<<endl;
+//                    printf("matched GenJet: pT/eta/phi= %f/%f/%f\n", genJet_matched->pt(),genJet_matched->eta(),genJet_matched->phi());                    
+//                    printf("associated GenMu: pT/eta/phi= %f/%f/%f\n", genJet_genMu_pair.second->pt(),genJet_genMu_pair.second->eta(),genJet_genMu_pair.second->phi());
+//                    //cout<<"jet.pat::Jet::hadronFlavour()= "<<jet.pat::Jet::hadronFlavour()<<endl;
+//                    //cout<<"jet.pat::Jet::partonFlavour()= "<<jet.pat::Jet::partonFlavour()<<endl;
+                    cout<<"jet.pat::Jet::jetFlavourInfo()->getHadronFlavour()= "<< jet.pat::Jet::jetFlavourInfo().getHadronFlavour()<<endl;
                     cout<<"jet.pat::Jet::jetFlavourInfo()->getPartonFlavour()= "<< jet.pat::Jet::jetFlavourInfo().getPartonFlavour()<<endl;
 //                    cout<<">>>>>>> pat::Mu analysis:"<<endl;
                     if(jet.genParton() != nullptr) printf("jet.genParton: pT/pdgId/status/ = %f/%i/%i/\n",jet.genParton()->pt(),jet.genParton()->pdgId(),jet.genParton()->status());
                     for (const pat::Muon &mu : *muons){   
-                    if(mu.pat::Lepton<reco::Muon>::genLepton() == nullptr) continue; 
-                    printf("mu.pat::Lepton<reco::Muon>::genLepton(): pT/eta/phi = %f/%f/%f\n",mu.genLepton()->pt(),mu.genLepton()->eta(),mu.genLepton()->phi());
-                    if((const reco::Candidate*)mu.pat::Lepton<reco::Muon>::genLepton() == genJet_genMu_pair.second){ 
-                       cout<<"genLepton() == mu_pair" <<endl; printf("pT/eta/ = %f/%f\n",mu.genLepton()->pt(),mu.genLepton()->eta()); 
-                                                                                                                   }
-                    printf("mu.simPdgId()/mu.simFlavour()/mu.simBX()/mu.simType() = %i/%i/%i/%i\n",mu.simPdgId(),mu.simFlavour(),mu.simBX(),mu.simType());
+                    if(!mu.pat::Muon::isSoftMuon(firstGoodVertex)) continue;
+                    if(mu.pat::Lepton<reco::Muon>::genLepton() == nullptr /*|| mu.simHeaviestMotherFlavour() == mu.simFlavour()*/) continue; 
+                    float DR_genLepton_pairedMu = deltaR(mu.genLepton()->eta(),mu.genLepton()->phi(),genJet_genMu_pair.second->eta(),genJet_genMu_pair.second->phi());
+                    float DR_patMu_pairedMu = deltaR(mu.eta(),mu.phi(),genJet_genMu_pair.second->eta(),genJet_genMu_pair.second->phi());
+
+                    printf("mu.pat::Lepton<reco::Muon>::genLepton(): pT/eta/phi/deltaR(this,paired) = %f/%f/%f/%f\n",mu.genLepton()->pt(),mu.genLepton()->eta(),mu.genLepton()->phi(),DR_genLepton_pairedMu);
+                    printf("pat::Muon: pT/eta/phi/deltaR(this,paired) = %f/%f/%f/%f\n",mu.pt(),mu.eta(),mu.phi(),deltaR(mu.eta(),mu.phi(),genJet_genMu_pair.second->eta(),genJet_genMu_pair.second->phi()));
+                    printf("mu.simPdgId()/mu.simFlavour()/mu.simHeaviestMotherFlavour()/mu.simType() = %i/%i/%i/%i\n",mu.simPdgId(),mu.simFlavour(),mu.simHeaviestMotherFlavour(),mu.simType());
+                       if(DR_genLepton_pairedMu>=0.005 || DR_patMu_pairedMu>=0.005 ||abs( (mu.genLepton()->pt()-mu.pt())/mu.genLepton()->pt() )> 0.075) continue;
+
+                          cout <<"GOOD PAT::MUON GENMUON MATCH"<<endl;
+                          muon_pt.push_back(mu.pt());  muon_phi.push_back(mu.phi());
+                          muon_eta.push_back(mu.eta()); muon_charge.push_back(mu.charge());
+                          const Track * mutrack= mu.bestTrack();
+                          muon_dz.push_back(mutrack->dz(vertex_point));
+                          muon_dxy.push_back(mutrack->dxy(vertex_point));
+                          muon_global_flag.push_back(mu.isGlobalMuon());
+                          muon_standalone_flag.push_back(mu.isStandAloneMuon());
+                          muon_tracker_flag.push_back(mu.isTrackerMuon());
+                          muon_vx.push_back(mu.vx());  muon_vy.push_back(mu.vy());
+                          muon_vz.push_back(mu.vz());  muon_edz.push_back(mu.dzError());
+                          muon_edxy.push_back(mu.dxyError());  muon_d0.push_back(mutrack->d0());
+                          muon_ed0.push_back(mutrack->d0Error());
+                          muon_medium.push_back(mu.isMediumMuon());
+                          muon_loose.push_back(mu.isLooseMuon());
+                          muon_trkpt.push_back(mutrack->pt()); muon_trketa.push_back(mutrack->eta());
+                          muon_trkphi.push_back(mutrack->phi());
+                          muon_tight.push_back(mu.isTightMuon(firstGoodVertex));
+                          muon_soft.push_back(mu.isSoftMuon(firstGoodVertex));
+                         //if (mu.isSoftMuon(firstGoodVertex))snmu++;
+                          const MuonPFIsolation&  isol=mu.pfIsolationR04();
+                          double mu_iso=(isol.sumChargedHadronPt+max(0.,isol.sumNeutralHadronEt+isol.sumPhotonEt-0.5*isol.sumPUPt))/mu.pt();
+                          muon_iso.push_back(mu_iso);
+                          muttks.push_back(reco::TransientTrack(*mutrack,&(*bFieldHandle)));   
+                          nmuons++;
+                          found_muon = true;
+                          break;//for_pat::Muon
                                                       }
+                    if(!found_muon) continue;
                     jet_pt.push_back(jet.pt()); jet_eta.push_back(jet.eta());
                     jet_phi.push_back(jet.phi());
                     jet_cEmEF.push_back(jet.chargedEmEnergyFraction());
@@ -1640,14 +1639,12 @@ const pat::MET &theMet = met->front();
                     jet_nMult.push_back(jet.neutralMultiplicity());
                     jet_pEF.push_back(jet.photonEnergyFraction());
                     njets++;
-                 break;
-                                                              }
-            //else cout<<"No matched genJet" <<endl;
-                // else cout<<":-((((( PAT::JET NO PROPER GENJET MATCH"<<endl;
-               }
-            }
-                                       }
-           }
+                     break;//for_pat::jet
+                                                              }//if_genJet_genMu_pair.first == jet.pat::genJet()
+                                        }//if_genJet_matched != nullptr
+                                       }//for_pat::Jets
+                                              }//if_genJet_genMu_pair = nullptr's
+           }//if_!data
   else{
       for (const pat::Jet &jet : *jets){ 
         if(jet.pt()<10. || abs(jet.eta())>2.1) continue;
