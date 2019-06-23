@@ -209,6 +209,7 @@ private:
   edm::Service<TFileService> fs;
   TTree * t1;
 //  NtupleContent nt;
+ int JetFlavourTag=0;
  int totb1=0,totb2=0,totb3=0;
   int trigger1=0,trigger2=0,trigger3=0,trigger4=0,trigger5=0,trigger6=0,trigger7=0,trigger8=0;
   int l1_seed1=0,l1_seed2=0,l1_seed3=0,l1_seed4=0,l1_seed5=0,l1_seed6=0;
@@ -400,6 +401,7 @@ bool TriggerAnalyzer<T1>::isAncestor(const reco::Candidate* ancestor, const reco
          using namespace trigger;
 	 using namespace pat;
 
+        JetFlavourTag=0;
         genJet_pt.clear(); genJet_eta.clear();genJet_y.clear();genJet_phi.clear();genJet_flavour.clear();genMuB_pt.clear();genMuB_eta.clear(); genMuB_phi.clear(); 
         genMuC_pt.clear();genMuC_eta.clear(); genMuC_phi.clear();genMuUDS_pt.clear();genMuUDS_eta.clear(); genMuUDS_phi.clear();
         genJet_mass.clear();bgenJet_genQuark_pt_ratio.clear();cgenJet_genQuark_pt_ratio.clear();lightgenJet_genQuark_pt_ratio.clear();
@@ -511,16 +513,19 @@ bool TriggerAnalyzer<T1>::isAncestor(const reco::Candidate* ancestor, const reco
              
       float genQuark_genJet_pt_ratio = genQuark_collection.at(max_index)->pt()/genJet_genMu_pair.first->pt(); 
                    if(max_pdgId==5){cout<<"b-tag: pT(Quark)/pT(Jet) = "<<genQuark_genJet_pt_ratio<<endl;
-                 //                    btag=true;
-                            //        printf("GenJet: pT/eta/phi= %f/%f/%f",genJet_genMu_pair.first->pt(),genJet_genMu_pair.first->eta(),genJet_genMu_pair.first->phi());
+                                    JetFlavourTag = genQuark_collection.at(max_index)->pdgId();
+                                     btag=true;
+                                    printf("GenJet: pT/eta/phi= %f/%f/%f",genJet_genMu_pair.first->pt(),genJet_genMu_pair.first->eta(),genJet_genMu_pair.first->phi());
                                    }
                    else if(max_pdgId==4){cout<<"c-tag: pT(Quark)/pT(Jet)= "<<genQuark_genJet_pt_ratio<<endl;
-                 //                         ctag=true;
-                              //           printf("GenJet: pT/eta/phi= %f/%f/%f",genJet_genMu_pair.first->pt(),genJet_genMu_pair.first->eta(),genJet_genMu_pair.first->phi());
+                                         JetFlavourTag = genQuark_collection.at(max_index)->pdgId();
+                                          ctag=true;
+                                         printf("GenJet: pT/eta/phi= %f/%f/%f",genJet_genMu_pair.first->pt(),genJet_genMu_pair.first->eta(),genJet_genMu_pair.first->phi());
                                         }
                    else{cout<<"uds-tag: pT(Quark)/pT(Jet)= "<<genQuark_genJet_pt_ratio<<endl;
-                       // printf("GenJet: pT/eta/phi= %f/%f/%f",genJet_genMu_pair.first->pt(),genJet_genMu_pair.first->eta(),genJet_genMu_pair.first->phi());
-                 //       udstag=true;
+                        JetFlavourTag = genQuark_collection.at(max_index)->pdgId();
+                        printf("GenJet: pT/eta/phi= %f/%f/%f",genJet_genMu_pair.first->pt(),genJet_genMu_pair.first->eta(),genJet_genMu_pair.first->phi());
+                        udstag=true;
                        }
 ////        for(unsigned int imo=0;imo<genJet_genMu_pair.at(q)->mother(0)->numberOfMothers();++imo) printf("genJet_genMu_pair.at(q)->mother(%i)->pdgId()= %i\n",imo,genJet_genMu_pair.at(q)->mother(imo)->pdgId());
 ////        for(unsigned int imo=0;imo<genJet_genMu_pair.at(q)->mother()->mother(0)->numberOfMothers();++imo) printf("genJet_genMu_pair.at(q)->mother()->mother(%i)->pdgId()= %i\n",imo,genJet_genMu_pair.at(q)->mother()->mother(imo)->pdgId());
@@ -588,87 +593,6 @@ bool TriggerAnalyzer<T1>::isAncestor(const reco::Candidate* ancestor, const reco
 //                       }
 //                              }
 //         else cout<<std::boolalpha<<"successful_match= "<<successful_match<<endl; 
-//////               //The following is why genJet_genMu_pair changed key indeces to genJet collected i.e. genJet_collection:
-//////
-//////                   bool full_match=false;
-//////                   const reco::Candidate * recursive_mo= genJet_genMu_pair.at(q)->mother(0); 
-//////                   //30/1/19: Check if GenQuark of GenJet excists in GenMu's DIRECT parenthood list.
-//////                    unsigned int imom=0;
-//////                        while(recursive_mo->pdgId() != 2212 && recursive_mo->pdgId() != 21 && ){ //first proton                                
-//////          //                   cout<<"recursive mother of collected GenMu pdgId/status/pT= "<<recursive_mo->pdgId()<<"/"<<recursive_mo->status()<<"/"<<recursive_mo->pt()<<endl; 
-//////                         if(deltaR(recursive_mo->eta(),recursive_mo->phi(),genJet_genMu_pair.first->eta(),genJet_genMu_pair.first->phi())>0.4){
-//////                          //    cout<<"recursive_mo not in GenJet"<<endl; 
-//////                                         recursive_mo = recursive_mo->mother(); 
-//////                                                                                                                                            }
-//////                              
-//////      
-//////                              //cout<<"recursive mother of collected GenMu pdgId/status/pT= "<<recursive_mo->pdgId()<<"/"<<recursive_mo->status()<<"/"<<recursive_mo->pt()<<endl; 
-//////                                  
-//////                                  if(recursive_mo->pdgId()==genQuark_collection.at(max_index)->pdgId() && recursive_mo->pt() == genQuark_collection.at(max_index)->pt()){
-//////                                     full_match=true;
-//////                                       printf(">>>>>>>GenQuark of '%u' GenJet matched mother of GenMu \n",q);
-//////                                       break;
-//////                                                                                                                                                                           } 
-//////                                         recursive_mo = recursive_mo->mother();
-//////                                                             }
-//////                      
-//////                         //re-initialize 
-//////                  if(full_match==false){         
-//////                         recursive_mo = genJet_genMu_pair.at(q)->mother();
-//////                         const reco::Candidate * first_fragmentation_meson = genJet_genMu_pair.at(q);//using this to save the meson
-//////                          while(fabs(recursive_mo->pdgId())>5 && recursive_mo->pdgId()!=21){
-//////                             recursive_mo = recursive_mo->mother();
-//////                             first_fragmentation_meson = first_fragmentation_meson->mother();
-//////                                                              }
-//////                                       
-//////            //               cout<<"@@@@First meson found: pdgId/status/pT/DR(meson-jet)= "<<first_fragmentation_meson->pdgId()<<"/"<<first_fragmentation_meson->status()<<"/"<<first_fragmentation_meson->pt()<<"/";
-//////                           cout<<deltaR(first_fragmentation_meson->eta(),first_fragmentation_meson->phi(),genJet_genMu_pair.first->eta(),genJet_genMu_pair.first->phi())<<endl;
-//////      
-//////                           //Now lets go and find the quark which both "created" the Jet and is mother of the meson that decayed to the mu!
-//////                           for(unsigned int m=0;m<first_fragmentation_meson->numberOfMothers();m++){
-//////                           //   printf("1st frag. meson mothers: pdgId/pT= %i/%f\n", first_fragmentation_meson->mother(m)->pdgId(),first_fragmentation_meson->mother(m)->pt());
-//////                              if(first_fragmentation_meson->mother(m)->pdgId()==genQuark_collection.at(max_index)->pdgId() && first_fragmentation_meson->mother(m)->pt()==genQuark_collection.at(max_index)->pt() && first_fragmentation_meson->mother(m)->eta()==genQuark_collection.at(max_index)->eta() && first_fragmentation_meson->mother(m)->phi()==genQuark_collection.at(max_index)->phi()){
-//////                                 cout<<":-))))))))))) FULL MATCH ACHIEVED YAAAAASS"<<endl; 
-//////                                 full_match=true;
-//////                                 
-//////                                 }
-//////                                                                                                  }
-//////      
-//////                                        }
-//////                                           
-//////                     if(full_match==false) cout<<" NOT FULL MATCH IN THIS JET :-((((((((((("<<endl;
-//////                     else{
-//////                              genJet_pt.push_back(genJet_genMu_pair.first->pt());
-//////                              genJet_eta.push_back(genJet_genMu_pair.first->eta());
-//////                              genJet_y.push_back(genJet_genMu_pair.first->y());
-//////                              genJet_phi.push_back(genJet_genMu_pair.first->phi());
-//////                              genJet_mass.push_back(genJet_genMu_pair.first->mass());
-//////                              genJet_flavour.push_back(genQuark_collection.at(max_index)->pdgId());
-//////                            
-//////                            float dR = deltaR(genJet_genMu_pair.at(q)->eta(),genJet_genMu_pair.at(q)->phi(),genJet_genMu_pair.first->eta(),genJet_genMu_pair.first->phi()); 
-//////                            if(btag==true){          
-//////                            dR_bJet_matching.push_back(dR);    
-//////                            bgenJet_genQuark_pt_ratio.push_back(genQuark_collection.at(max_index)->pt()/genJet_genMu_pair.first->pt());
-//////                            genMuB_pt.push_back(genJet_genMu_pair.at(q)->pt());   
-//////                            genMuB_eta.push_back(genJet_genMu_pair.at(q)->eta());   
-//////                            genMuB_phi.push_back(genJet_genMu_pair.at(q)->phi());   
-//////                                         }
-//////                            else if(ctag==true){          
-//////                            dR_cJet_matching.push_back(dR);    
-//////                            cgenJet_genQuark_pt_ratio.push_back(genQuark_collection.at(max_index)->pt()/genJet_genMu_pair.first->pt());
-//////                            genMuC_pt.push_back(genJet_genMu_pair.at(q)->pt());   
-//////                            genMuC_eta.push_back(genJet_genMu_pair.at(q)->eta());   
-//////                            genMuC_phi.push_back(genJet_genMu_pair.at(q)->phi());   
-//////                                         }
-//////                            else if(udstag==true){          
-//////                            dR_lightJet_matching.push_back(dR);    
-//////                            lightgenJet_genQuark_pt_ratio.push_back(genQuark_collection.at(max_index)->pt()/genJet_genMu_pair.first->pt());
-//////                            genMuUDS_pt.push_back(genJet_genMu_pair.at(q)->pt());   
-//////                            genMuUDS_eta.push_back(genJet_genMu_pair.at(q)->eta());   
-//////                            genMuUDS_phi.push_back(genJet_genMu_pair.at(q)->phi());   
-//////                                         }
-//////      
-//////                         }
                 }//if_empty_genQuark_collection       
                 }//if_genJet_genMu_pair.first == nullptr
                 }//if_nullptr_mu'si
@@ -1565,7 +1489,7 @@ const pat::MET &theMet = met->front();
     ptmet=theMet.et();
     phimet=theMet.phi();
 
-  cout<<  "======pat::Jet analysis:" <<endl;
+  cout<<  "!!!!!!!======pat::Jet analysis:" <<endl;
   if(!data){
     std::pair<const reco::GenJet*, const reco::Candidate *> genJet_genMu_pair = genJetMuAnalyze(iEvent,iSetup);
     if(genJet_genMu_pair.first != nullptr && genJet_genMu_pair.second != nullptr){
@@ -1583,7 +1507,8 @@ const pat::MET &theMet = met->front();
 //                    //cout<<"jet.pat::Jet::partonFlavour()= "<<jet.pat::Jet::partonFlavour()<<endl;
                     cout<<"jet.pat::Jet::jetFlavourInfo()->getHadronFlavour()= "<< jet.pat::Jet::jetFlavourInfo().getHadronFlavour()<<endl;
                     cout<<"jet.pat::Jet::jetFlavourInfo()->getPartonFlavour()= "<< jet.pat::Jet::jetFlavourInfo().getPartonFlavour()<<endl;
-//                    cout<<">>>>>>> pat::Mu analysis:"<<endl;
+                    cout<<"My JetFlavourTag = "<<JetFlavourTag<<endl; 
+                    cout<<">>>>>>> pat::Mu analysis:"<<endl;
                     if(jet.genParton() != nullptr) printf("jet.genParton: pT/pdgId/status/ = %f/%i/%i/\n",jet.genParton()->pt(),jet.genParton()->pdgId(),jet.genParton()->status());
                     for (const pat::Muon &mu : *muons){   
                     if(!mu.pat::Muon::isSoftMuon(firstGoodVertex)) continue;
