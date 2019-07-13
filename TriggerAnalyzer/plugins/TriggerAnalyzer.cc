@@ -250,6 +250,7 @@ private:
   std::vector<float> NRbks_k_sdxy,NRbks_pi_sdxy,NRbks_mass,NRbks_charge,NRbks_chi_prob,NRbks_bspot_lxy, NRbks_bspot_elxy,NRbks_cosTheta2D,NRbks_mll,NRbks_ksmass; 
   std::vector<std::vector<float>> NRbks_pt_eta_phi,NRbks_x_y_z,NRbks_ex_ey_ez,NRbks_ept_eeta_ephi,NRbks_l2pt_eta_phi,NRbks_l1pt_eta_phi,NRbks_Kpt_eta_phi,NRbks_Pipt_eta_phi; 
   std::vector<unsigned int> NRbks_mudecay,NRbks_lep1Id, NRbks_lep2Id;
+
   //Gen event data:
   std::vector<float> genJet_mass,bgenJet_genQuark_pt_ratio,cgenJet_genQuark_pt_ratio,lightgenJet_genQuark_pt_ratio,genJet_pt,genJet_eta,genJet_y,genJet_phi,genJet_flavour;
   std::vector<float> genJet_genMu_pt_ratio, bJet_genMu_pt_ratio, cJet_genMu_pt_ratio,lightJet_genMu_pt_ratio;
@@ -257,6 +258,7 @@ private:
   std::vector<float> genMu_pt,genMu_eta,genMu_phi,genMu_quarkMO_pdgId,genMu_quarkMO_pt,genMu_quarkMO_eta,genMu_quarkMO_phi;
   std::vector<bool> map_quark_jet_muon;//true when quark is parent to both Jet and Muon.
   std::vector<float> bFragmentation_function_pT,cFragmentation_function_pT,lightFragmentation_function_pT;
+  std::vector<float> bMeson_pdgId;bMeson_pt;bMeson_y;bMeson_phi;bMeson_m;bQuark_pdgId;bQuark_pt;bQuark_y;bQuark_phi;bQuark_m;
   //pat data (25.06.19):
   std::vector<float> bjet_pt,bjet_eta,bjet_phi,cjet_pt,cjet_eta,cjet_phi,qjet_pt,qjet_eta,qjet_phi;
   std::vector<float> pTb_rel,pTc_rel,pTq_rel,pTb_rel_dir,pTb_rel_indir;
@@ -415,6 +417,17 @@ bool TriggerAnalyzer<T1>::isAncestor(const reco::Candidate* ancestor, const reco
         bFragmentation_function_pT.clear(),cFragmentation_function_pT.clear(),lightFragmentation_function_pT.clear();
         map_quark_jet_muon.clear();
 
+        bMeson_pdgId.clear();
+        bMeson_pt.clear();
+        bMeson_y.clear();
+        bMeson_phi.clear();
+        bMeson_m.clear();
+        bQuark_pdgId.clear();
+        bQuark_pt.clear();
+        bQuark_y.clear();
+        bQuark_phi.clear();
+        bQuark_m.clear();
+
         edm::Handle<edm::View<reco::GenParticle>> genPruned;
         iEvent.getByToken(prunedGenToken_,genPruned);
         edm::Handle<edm::View<pat::PackedGenParticle>> genPacked;
@@ -572,6 +585,16 @@ bool TriggerAnalyzer<T1>::isAncestor(const reco::Candidate* ancestor, const reco
               genJet_flavour.push_back(genQuark_collection.at(max_index)->pdgId());
              if(btag){
                       bFragmentation_function_pT.push_back(first_fragmentation_meson->pt()/genQuark_collection.at(max_index)->pt());
+                      bMeson_pdgId.push_back(first_fragmentation_meson->pdgId());
+                      bMeson_pt.push_back(first_fragmentation_meson->pt());
+                      bMeson_y.push_back(first_fragmentation_meson->y());
+                      bMeson_phi.push_back(first_fragmentation_meson->phi());
+                      bMeson_m.push_back(first_fragmentation_meson->mass());
+                      bQuark_pdgId.push_back(genQuark_collection.at(max_index)->pdgId());
+                      bQuark_pt.push_back(genQuark_collection.at(max_index)->pt());
+                      bQuark_y.push_back(genQuark_collection.at(max_index)->y());
+                      bQuark_phi.push_back(genQuark_collection.at(max_index)->phi());
+                      bQuark_m.push_back(genQuark_collection.at(max_index)->mass());
 //		      if(bFragmentation_function_pT.at(0)<first_fragmentation_meson->pt()/genQuark_collection.at(max_index)->pt())printf("bFragmentation function= %f, pT(meson)/pT(quark)= %f\n",bFragmentation_function_pT.at(0),first_fragmentation_meson->pt()/genQuark_collection.at(max_index)->pt());
                       genMuB_pt.push_back(genJet_genMu_pair.second->pt());   
                       genMuB_eta.push_back(genJet_genMu_pair.second->eta());   
@@ -1729,6 +1752,17 @@ TriggerAnalyzer<T1>::beginJob()
   t1->Branch("pTb_rel_indir",&pTb_rel_indir);
   t1->Branch("pTc_rel",&pTc_rel);
   t1->Branch("pTq_rel",&pTq_rel);
+  
+  t1->Branch("bMeson_pdgId",bMeson_pdgId);
+  t1->Branch("bMeson_pt",&bMeson_pt);
+  t1->Branch("bMeson_y",&bMeson_y);
+  t1->Branch("bMeson_phi",&bMeson_phi);
+  t1->Branch("bMeson_m",&bMeson_m);
+  t1->Branch("bQuark_pdgId",bQuark_pdgId);
+  t1->Branch("bQuark_pt",&bQuark_pt);
+  t1->Branch("bQuark_y",&bQuark_y);
+  t1->Branch("bQuark_phi",&bQuark_phi);
+  t1->Branch("bQuark_m",&bQuark_m);
 
   t1->Branch("map_quark_jet_muon",&map_quark_jet_muon);
   t1->Branch("bgenJet_genQuark_pt_ratio",&bgenJet_genQuark_pt_ratio);
