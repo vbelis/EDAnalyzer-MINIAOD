@@ -2,42 +2,24 @@
 import FWCore.ParameterSet.Config as cms
 IsData=False
 Run="A"
-output_path="/afs/cern.ch/work/v/vbelis/private/QCD_Pt-80to120_part2_MINIAOD_onlyMuPt5_200kEvts.root"
-RecoBtoKLepLep=False
-RecoBtoKstarLepLep=False
-SkipEventWithNoRecoB=False
-MuonsOnly=True
-ElectronsOnly=False
+output_path="/afs/cern.ch/work/v/vbelis/private/QCD_Pt-15to20_test.root"
 addlostTrk=False
 saveTrk=False
 #Nentries=629771
-#Nentries=1000
-Nentries = 200000 - 182908
+Nentries= int(1000)
 print Nentries
 File=['/store/data/Run2018B/ParkingBPH5/MINIAOD/PromptReco-v1/000/317/650/00000/321646CB-F76E-E811-91FF-FA163EE936A8.root']
 ############
-if RecoBtoKLepLep : 
-   print "reconstructing B->Kll channel"
-if RecoBtoKstarLepLep :
-   print "reconstructing B->K*ll->Kpill channel"
 
-Addel=True
-Onlyel=False
-if MuonsOnly and not ElectronsOnly:
-  Addel=False 
-elif ElectronsOnly and not MuonsOnly:
-  Onlyel=True
-elif ElectronsOnly and MuonsOnly:
-   print "warning both chanels will be kept"
-
-
-SkipNoKLL=False
-if RecoBtoKLepLep and SkipEventWithNoRecoB :
-   SkipNoKLL=True
-#print SkipNoKLL
-SkipNoKsLL=False
-if RecoBtoKstarLepLep and SkipEventWithNoRecoB :
-   SkipNoKsLL=True
+globaltag='102X_upgrade2018_realistic_v15' 
+L1save=False ; HLTsave=False ; HLTfired=False
+if IsData:
+   print "Running on data."
+   globaltag='101X_dataRun2_Prompt_v11'
+   L1save=True ; HLTsave=True ; HLTfired=True
+else:
+   print "Running on MC"
+print "Run parameters: globaltag=",globaltag,", save L1 = ",L1save,", HLT = ",HLTsave,", save event if path fired = ",HLTfired
 
 if Run=="A":
    n1="HLT_Mu9_IP6_part" ; n2="HLT_Mu8p5_IP3p5" ; n3 ="HLT_Mu10p5_IP3p5" ; 
@@ -49,17 +31,6 @@ elif Run=="D":
    n1="HLT_Mu9_IP6_part" ; n2="HLT_Mu9_IP5" ; n3="HLT_Mu7_IP4"; n4="HLT_Mu8_IP3"; n5="HLT_Mu12_IP6" ; n6="HLT_Mu9_IP4" ; n7="HLT_Mu8_IP6"; n8="HLT_Mu8_IP5"
 else:
    n1="empty" ; n2=n1 ;n3=n1 ; n4=n1 ; n5=n1 ; n6=n1 ; n7=n1 ; n8=n1
-   
-
-globaltag='102X_upgrade2018_realistic_v15' 
-L1save=False ; HLTsave=False ; HLTfired=False
-if IsData:
-   print "We have established we Run on data"
-   globaltag='101X_dataRun2_Prompt_v11'
-   L1save=True ; HLTsave=True ; HLTfired=True
-else:
-   print "We have established we Run on MC"
-print "Run parameters ",globaltag," save L1 ",L1save," HLT ",HLTsave," save ev. if path fired ",HLTfired
 
 process = cms.Process("Demo")
 
@@ -104,18 +75,6 @@ process.source = cms.Source("PoolSource",
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-120to170_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/110000/311932BD-57BE-1240-B2B6-27B892E861AD.root',
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-120to170_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/110000/2D8578FF-8530-8440-BDF6-6197E27FDE46.root',
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-120to170_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/110000/2D3B74D9-24D0-8644-B5DC-76CF922C758F.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/100000/FB6134EC-A899-E248-A49C-ADD8649A91C4.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/100000/F4953B6B-A172-6242-B828-F803C0071AAE.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/100000/F061F93B-72DA-864B-A703-21228F937CF8.root',
-'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/100000/DBAF10DF-289B-394D-A1AC-132101043BD5.root',
-'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/100000/C5579E6A-B196-F945-BA70-24B63710BD64.root',
-'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/100000/ACBE235F-993F-F841-A699-AFABCBCBFA8D.root',
-'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/100000/7E57252B-4422-E44F-A1A8-62B9F077B19A.root',
-'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/100000/61C945A1-4769-8748-8F40-AC37C6833133.root',
-'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/100000/4848E12C-F2E1-624D-90E3-ADE0DD332995.root',
-'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/100000/42DA49D9-4F0B-DD41-91B6-F2FF10374EFE.root',
-'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/100000/4107CDD4-D1A9-8041-AB77-0A010790CEDF.root',
-'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/100000/32F17ABD-FF22-6B47-A4A6-78D1248A548F.root',
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-50to80_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/90000/FEDBFF89-17A8-BE4A-809B-4A380F235BCE.root',
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-50to80_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/90000/FD47B283-E15C-9446-BA06-21B06AEF04F3.root',
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-50to80_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/90000/FCDFEFE2-E3CD-F64B-B81C-59C0087A4BBA.root',
@@ -133,6 +92,20 @@ process.source = cms.Source("PoolSource",
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-50to80_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/90000/E87B4BCB-8807-EE41-8175-ECDF8363FBAD.root',
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-50to80_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/90000/E67C456E-E6A9-A14A-AECA-876B931BCA7C.root',
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-50to80_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/90000/E16A7364-3A91-2F43-BA87-612A015896D2.root',
+#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext1-v2/90000/FF10EDD5-30E4-8449-B8F3-FCFA7DDF3F3E.root',
+#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext1-v2/90000/FCCD3188-99C2-AC42-8A68-26748327455C.root',
+#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext1-v2/90000/F6AB9BF1-CFE7-C44E-88B9-69A2108A8500.root',
+#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext1-v2/90000/F41BBF37-F1D5-5A47-BE39-3FE0EC9F8CF9.root',
+#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext1-v2/90000/F3598F7B-4AF3-9141-9964-30CCCE69CA18.root',
+#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext1-v2/90000/F2BF95F7-3708-F243-85DE-BC40A38330BC.root',
+#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext1-v2/90000/EB346302-3DAE-0042-903D-3D96636FA94D.root',
+#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext1-v2/90000/E58294C7-193C-AF41-8F72-FDB30D52CEE7.root',
+#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext1-v2/90000/DEF13755-26C7-B641-914C-E0D9BD64B7DE.root',
+#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext1-v2/90000/D69955FF-B082-054B-B660-95F14706592C.root',
+#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext1-v2/90000/D3C7B32E-D7C9-3A45-B77B-ACB02C737E55.root',
+#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext1-v2/90000/CE5E5CA7-48E6-2945-A960-FD6FEA4AA53E.root',
+#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext1-v2/90000/CE02F91E-FA45-AF4C-9B08-12F509D0B7CA.root',
+#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext1-v2/90000/C73C463C-1FCF-544B-9FA0-B0F330E1E3D7.root',
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-30to50_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/90000/FD570F6C-6901-8245-9D50-ABF38AFA3197.root',
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-30to50_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/90000/FD06DB3C-4E13-3344-A730-1C5B58C76FA8.root',
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-30to50_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/90000/FCD7697C-9B9C-7D43-8B56-7E916BF793A3.root',
@@ -185,37 +158,26 @@ process.source = cms.Source("PoolSource",
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-170to300_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/120000/F67AF596-2279-D84E-A7CA-79D25560824D.root',
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-170to300_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/120000/F6134C44-7F43-5C4E-AAC0-C06B29EE3EA6.root',
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-170to300_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/120000/F5815F2A-85BC-0D4A-82E1-852941270B3E.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/70000/D79A9D9B-E255-9B4F-8CAC-C9937829D398.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/70000/BA314D29-FE76-5C42-8563-F04C4AA80771.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/FE478DDA-CDA2-9C41-9A8C-18DAAA5193CF.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/DEE2E14E-8A89-2A40-9CC2-DBAFC51449C3.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/DC918904-9517-EF4B-AFEE-B0D2F5F5F5AB.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/D0624E72-FBB1-5D4F-A7E8-30D9CB25AC11.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/BC4D607E-911B-4A4F-B19A-04A919D73FD2.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/B91947AB-34AE-E641-9029-C79F59AC3572.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/AD4C6F5F-9BDE-EF4F-BDEF-1602190C05E7.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/ABF90A6C-1BCD-D843-9839-FB7C38D98048.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/AB5A9476-3D6F-9A47-8B36-384E51CB0A79.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/A382EDB7-5E0D-084C-9EF6-59B1AA5C833F.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/8E06C481-EC16-8740-854A-F96D07A36418.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/89D8A3DA-FBCA-BC4B-97E8-EFE087DE20BE.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/8280654F-16EB-2944-B475-C524AC666837.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/7F8CF172-C038-044A-BAD6-CF0511F455D5.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/7604A01F-4365-F04C-9035-922BDE22D722.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/6AD174AC-FEA7-5445-A7D2-4B797D4DA3AD.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/60CEB336-A170-934D-A9CF-56B43460024F.root',
-#'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/5B5E3617-66F3-F647-BDB0-50DA256D637C.root',
-#for aod comparison
-# '/store/data/Run2018A/ParkingBPH1/MINIAOD/14May2018-v1/30000/F637E740-F259-E811-B4BB-782BCB3B1A58.root'
-#'/store/user/tstreble/BToKee_Pythia/BToKee_Pythia_MINIAODSIM_18_03_21/180319_172427/0001/BToKee_MINIAODSIM_1727.root'
-#aod comp 2
-#'/store/data/Run2018B/ParkingBPH5/MINIAOD/PromptReco-v1/000/317/696/00000/F216061E-AF70-E811-B98A-FA163EC375AA.root'
-#'/store/user/tstreble/BToKmm_Pythia/BToKmm_Pythia_MINIAODSIM_18_03_26/180326_093119/0000/BToKmm_MINIAODSIM_99.root'
-#fastsim
-#"file:/afs/cern.ch/work/g/gkaratha/private/SUSYCMG/BtoKppmunu_production/CMSSW_9_3_6/src/step3_PAT.root"
-#'/store/group/cmst3/user/gkaratha/PAT_FastSim_GenBToKEE_NonD_muFilter_ForProbe_try1/CRAB_UserFiles/crab_PAT_FastSim_GenBToKEE_NonD_muFilter_ForProbe_try1/190129_202905/0000/step3_PAT_2.root'
-#'/store/mc/RunIIAutumn18MiniAOD/BuToK_Toee_MuFilter_SoftQCDnonD_TuneCP5_13TeV-pythia8-evtgen/MINIAODSIM/PUPoissonAve20_102X_upgrade2018_realistic_v15-v3/90000/FE81DFA9-EA47-764C-842D-1F7A31327500.root'
-
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/70000/D79A9D9B-E255-9B4F-8CAC-C9937829D398.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/70000/BA314D29-FE76-5C42-8563-F04C4AA80771.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/FE478DDA-CDA2-9C41-9A8C-18DAAA5193CF.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/DEE2E14E-8A89-2A40-9CC2-DBAFC51449C3.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/DC918904-9517-EF4B-AFEE-B0D2F5F5F5AB.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/D0624E72-FBB1-5D4F-A7E8-30D9CB25AC11.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/BC4D607E-911B-4A4F-B19A-04A919D73FD2.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/B91947AB-34AE-E641-9029-C79F59AC3572.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/AD4C6F5F-9BDE-EF4F-BDEF-1602190C05E7.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/ABF90A6C-1BCD-D843-9839-FB7C38D98048.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/AB5A9476-3D6F-9A47-8B36-384E51CB0A79.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/A382EDB7-5E0D-084C-9EF6-59B1AA5C833F.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/8E06C481-EC16-8740-854A-F96D07A36418.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/89D8A3DA-FBCA-BC4B-97E8-EFE087DE20BE.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/8280654F-16EB-2944-B475-C524AC666837.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/7F8CF172-C038-044A-BAD6-CF0511F455D5.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/7604A01F-4365-F04C-9035-922BDE22D722.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/6AD174AC-FEA7-5445-A7D2-4B797D4DA3AD.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/60CEB336-A170-934D-A9CF-56B43460024F.root',
+'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/60000/5B5E3617-66F3-F647-BDB0-50DA256D637C.root',
   ),
    secondaryFileNames=cms.untracked.vstring(
 ),
@@ -279,25 +241,11 @@ process.demo = cms.EDAnalyzer('TriggerAnalyzerb',
  #                              tracks=cms.InputTag("unpackedTracksAndVertices"),
 
                                RunParameters = cms.PSet(
-      Data= cms.bool(IsData),SaveTracks=cms.bool(saveTrk),
+      Data= cms.bool(IsData), SaveTracks=cms.bool(saveTrk),
       SaveHLT=cms.bool(HLTsave),SaveL1=cms.bool(L1save),
       SaveResultsOnlyIfAPathFired=cms.bool(HLTsave),
-      ReconstructBMuMuK=cms.bool(RecoBtoKLepLep),
-      ReconstructBMuMuKstar=cms.bool(RecoBtoKstarLepLep),
-      MuonPtCutForB=cms.double(1.5),TrackPtCutForB=cms.double(1.3),
-      PointingConstraint=cms.bool(False),CosThetaCutPointCons=cms.bool(False),
-      CosThetaCut=cms.double(-1),UseClosestVertex=cms.bool(False),
-      ProbBMuMuKcut=cms.double(-0.001),
-      SkipEventWithNoBToMuMuK=cms.bool(SkipNoKLL),UseBeamspot=cms.bool(False),
-      AddeeK=cms.bool(Addel),MLLmax_Cut=cms.double(5),MLLmin_Cut=cms.double(0),
-      MBmin_Cut=cms.double(4.5),
-      MBmax_Cut=cms.double(6),EtaTrk_Cut=cms.double(2.5),
-      MKstarMin_Cut=cms.double(0.742),MKstarMax_Cut=cms.double(1.042),
-      LepTrkExclusionCone=cms.double(0.005),AddLostTracks=cms.bool(addlostTrk),
-      RefitTracks=cms.bool(False),RefitMuTracksOnly=cms.bool(True),
-      OnlyKee=cms.bool(Onlyel),UsePFeForCos=cms.bool(True),
-      SkipEventWithNoBToMuMuKstar=cms.bool(SkipNoKsLL)
-  ),
+      UseBeamspot=cms.bool(False)
+      ),
 )
 
 process.load( "HLTrigger.HLTanalyzers.hlTrigReport_cfi" )
