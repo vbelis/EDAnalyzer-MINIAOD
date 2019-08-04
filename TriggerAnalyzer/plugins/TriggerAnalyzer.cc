@@ -129,13 +129,6 @@
 /*namespace edm {
   class ConfigurationDescriptions;
   }*/
-
-
-
-using namespace std;
-//using namespace edm;
-
-
 //
 // class declaration
 //
@@ -146,7 +139,7 @@ using namespace std;
 // constructor "usesResource("TFileService");"
 // This will improve performance in multithreaded jobs.
 template<typename T1>
-class TriggerAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+class TriggerAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>{
 
   typedef std::vector<T1> T1Collection;
   typedef edm::Ref<T1Collection> T1Ref;
@@ -816,9 +809,6 @@ TriggerAnalyzer<T1>::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   using namespace trigger;
 
   ++event;
-
-  //Get a few collections to apply basic electron ID
-  //Get data
   edm::Handle<reco::BeamSpot> theBeamSpot;
   iEvent.getByToken(beamSpotToken_,theBeamSpot); 
    edm::Handle<reco::VertexCollection> vertices;

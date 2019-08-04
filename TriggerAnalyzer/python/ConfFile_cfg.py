@@ -7,7 +7,7 @@ addlostTrk=False
 saveTrk=False
 #Nentries=629771
 Nentries= int(1000)
-print Nentries
+print "Analyzing N="Nentries " events."
 File=['/store/data/Run2018B/ParkingBPH5/MINIAOD/PromptReco-v1/000/317/650/00000/321646CB-F76E-E811-91FF-FA163EE936A8.root']
 ############
 
