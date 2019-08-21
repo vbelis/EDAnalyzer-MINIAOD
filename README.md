@@ -4,11 +4,11 @@ EDAnalyzer package for MINIAOD file format, runs on MC and data. Used in CMS exp
 
 ## Basic Functionalities
 Basic Functions used for the pTrel b-Purity study:
-### genJetMuAnalyze:
+### _genJetMuAnalyze_:
 Creates a pair of a Jet and a Muon at Generation level. For the pair to be created, the following must be true:
 - deltaR(Jet,Muon)<0.4.
 - The quark whose fragmentation/hadronization is responsible for the Jet, is an ancestor of the muon.
-### analyze
+### _analyze_:
 The main function of every CMSSW analyzer, which loops over the events and calls all other defined functions. For the b-Purity study, this function did only two things. The first is to call genJetMuAnalyze in every event and the second is to save all Muon and Jet information of each event at Reconstuction level. Then all info is saved in an output .root file -_MC Sample_- in a TTree form. From there, the analysis continues with the [MC Template Producer & Fitter](https://github.com/vbelis/MC_templateProducer_fitter).
 
 There is also a section of code which at the time is under development. Its purpose is to create a preliminary _MC Template_ with all the necessary information needed for the analysis (e.g. b-Purity study). Then the final MC Template can be created by another program, which, just, applies the kinematic cuts and othe criteria. However, up until now,for the b-Purity study, this section of code was not used. The refered sectio of code is:
