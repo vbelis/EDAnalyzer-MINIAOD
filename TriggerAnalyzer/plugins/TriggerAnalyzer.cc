@@ -4,11 +4,11 @@
 /**\class TriggerAnalyzer TriggerAnalyzer.cc HLTAnalysis/TriggerAnalyzer/plugins/TriggerAnalyzer.cc
 
  Author: Vasileios (Vasilis) Belis
+         The original Analyzer code of G. Karathanasis  was critical for my work and the creation of this Analyzer.
 
  Description & Notes: 
  //Analyzer made for pTrel bPurity analysis, mainly for MC events. Includes some code remnants, "#include's" and variables of an old Analyzer (e.g.HLTAnalyze function)
  //made by G. Karathanasis. These remnants are not needed for the function of the current Analyzer. They are kept for potential future functionalities of the Analyzer.
-          The original Analyzer code of G. Karathanasis  was critical for my work and the creation of this Analyzer.
 
  Implementation:
      [Notes on implementation]
