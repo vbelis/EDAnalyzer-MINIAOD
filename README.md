@@ -11,7 +11,7 @@ Creates a pair of a Jet and a Muon at Generation level. For the pair to be creat
 ### _analyze_:
 The main function of every CMSSW analyzer, which loops over the events and calls all other defined functions. For the b-Purity study, this function did only two things. The first is to call genJetMuAnalyze in every event and the second is to save all Muon and Jet information of each event at Reconstuction level. Then all info is saved in an output .root file -_MC Sample_- in a TTree form. From there, the analysis continues with the [MC Template Producer & Fitter](https://github.com/vbelis/MC_templateProducer_fitter).
 
-There is also a section of code which at the time is under development. Its purpose is to create a preliminary _MC Template_ with all the necessary information needed for the analysis (e.g. b-Purity study). Then the final MC Template can be created by another program, which, just, applies the kinematic cuts and othe criteria. However, up until now,for the b-Purity study, this section of code was not used. The refered sectio of code is:
+There is also a section of code that is under development. Its purpose is to create a preliminary _MC Template_ with all the necessary information needed for the analysis (e.g. b-Purity study). Then the final MC Template can be created by another program, which, just, applies the kinematic cuts and othe criteria.  Thus the purpose is to "eliminate" the need to use a seperate MC Template producer which takes as an input the MC Sample.  However, up until now,for the b-Purity study, this section of code was not used. The refered section of code is:
 ```c++
   if(!data){
     std::pair<const reco::GenJet*, const reco::Candidate*> genJet_genMu_pair = genJetMuAnalyze(iEvent,iSetup);
