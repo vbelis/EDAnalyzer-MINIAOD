@@ -7,7 +7,6 @@ addlostTrk=False
 saveTrk=False
 Nentries= int(1000)
 print "Analyzing N=",Nentries, " events."
-inputFiles=['/store/data/Run2018B/ParkingBPH5/MINIAOD/PromptReco-v1/000/317/650/00000/321646CB-F76E-E811-91FF-FA163EE936A8.root']
 ############
 
 globaltag='102X_upgrade2018_realistic_v15' 
@@ -52,6 +51,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag,globaltag, '')
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(Nentries) )
 
+inputFiles=['/store/data/Run2018B/ParkingBPH5/MINIAOD/PromptReco-v1/000/317/650/00000/321646CB-F76E-E811-91FF-FA163EE936A8.root']
 #inputFiles=[
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/70000/D79A9D9B-E255-9B4F-8CAC-C9937829D398.root',
 #'/store/mc/RunIIAutumn18MiniAOD/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v3/70000/BA314D29-FE76-5C42-8563-F04C4AA80771.root',
