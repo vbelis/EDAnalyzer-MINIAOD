@@ -1078,6 +1078,7 @@ l1_seed1=0; l1_seed2=0; l1_seed3=0; l1_seed4=0; l1_seed5=0; l1_seed6=0;
   else{
       for (const pat::Jet &jet : *jets){ 
         if(jet.pt()<10. || abs(jet.eta())>2.1) continue;
+	cout<<"In event= "<<event<<", jet_pt= "<<jet.pt()<<endl;
         jet_pt.push_back(jet.pt()); jet_eta.push_back(jet.eta());
         jet_phi.push_back(jet.phi());
         jet_cEmEF.push_back(jet.chargedEmEnergyFraction());
